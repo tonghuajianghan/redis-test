@@ -13,17 +13,19 @@ public class redisTest {
 
 	@Test
 	public void test() {
-		Jedis jedis = new Jedis("localhost");
+		Jedis jedis = new Jedis("localhost");//默认端口
 		jedis.set("foo", "bar");
 		String value = jedis.get("foo");
 		System.out.println(value);
+		System.out.println("------------------------------");
 	}
 
-	@Ignore
+//	@Ignore
 	@Test
 	public void RedisList() {
 		// 连接本地的 Redis 服务
-		Jedis jedis = new Jedis("localhost");
+		Jedis jedis = new Jedis("localhost");//默认端口
+		//Jedis jedis = new Jedis(host, port);
 		System.out.println("Connection to server sucessfully");
 		// 存储数据到列表中
 		jedis.lpush("tutorial-list", "Redis");
@@ -48,5 +50,6 @@ public class redisTest {
 		while(i.hasNext()){
 			System.out.println(i.next());
 		}
+		System.out.println("------------------------------");
 	}
 }
