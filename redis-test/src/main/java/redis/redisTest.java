@@ -11,9 +11,11 @@ import redis.clients.jedis.Jedis;
 
 public class redisTest {
 
+	public String localhost = "192.168.184.1";
+	
 	@Test
 	public void test() {
-		Jedis jedis = new Jedis("localhost");//默认端口
+		Jedis jedis = new Jedis(localhost);//默认端口
 		jedis.set("foo", "bar");
 		String value = jedis.get("foo");
 		System.out.println(value);
@@ -24,7 +26,7 @@ public class redisTest {
 	@Test
 	public void RedisList() {
 		// 连接本地的 Redis 服务
-		Jedis jedis = new Jedis("localhost");//默认端口
+		Jedis jedis = new Jedis(localhost);//默认端口
 		//Jedis jedis = new Jedis(host, port);
 		System.out.println("Connection to server sucessfully");
 		// 存储数据到列表中
@@ -41,7 +43,7 @@ public class redisTest {
 	@Test
 	public void RedisKeys() {
 		// 连接本地的 Redis 服务
-		Jedis jedis = new Jedis("localhost");
+		Jedis jedis = new Jedis(localhost);
 		System.out.println("Connection to server sucessfully");
 
 		// 获取数据并输出
