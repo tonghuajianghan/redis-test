@@ -54,4 +54,24 @@ public class redisTest {
 		}
 		System.out.println("------------------------------");
 	}
+	
+	//=========================================String =========================================================
+	@Test
+	public void redisAppend(){
+		//原有value基础上拼接,而不是覆盖
+		Jedis jedis = new Jedis(localhost);
+		jedis.append("wh", "wh");
+		System.out.println(jedis.get("wh"));
+		System.out.println("------------------------------");
+	}
+	
+	@Test
+	public void redisStringMset(){
+		//原有value基础上拼接,而不是覆盖
+		Jedis jedis = new Jedis(localhost);
+		jedis.mset("key1","value1","key2","value2","age","23");
+		jedis.incr("age");//进行加1操作
+		System.out.println("key1:"+jedis.get("key1")+"|key2:"+jedis.get("key2")+"|age:"+jedis.get("age"));
+		System.out.println("------------------------------");
+	}
 }
