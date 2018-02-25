@@ -1,0 +1,57 @@
+command
+    TTL KEY_NAME
+    返回 -2 key不存在
+    返回 -1 当 key 存在但没有设置剩余生存时间时
+    否则，以秒为单位，返回 key 的剩余生存时间
+
+redis 有两种使用方式
+    1. 将Redis作为一种缓存使用  
+    2. 将Redis作为一种持久化数据使用
+
+1.缓存使用  
+    内存回收策略  
+    当内存使用量达到maxmemory的限制时，你可以使用maxmemory-policy配置指令决定Redis此时的具体行为。
+如果你将Redis作为一种缓存使用，那么当你添加新的数据时，
+有时候可以让Redis自动释放旧数据占用的内存，这是一个非常方便的功能。
+这种行为在开发者社区中是众所周知的，因为广为流行的memcached系统的默认行为也是这样的。
+
+内存回收策略(5种)
+    当内存使用量达到maxmemory的限制时，你可以使用maxmemory-policy配置指令决定Redis此时的具体行为。
+    eg:config maxmemory 50000   / config maxmemory-policy allkeys-lru
+
+noeviction：当达到内存使用量的限制时，Redis会返回错误信息，
+而客户端仍然会尝试执行可能导致内存使用量超限的命令（包括大多数的写入命令，但是DEL之类的命令除外）。
+allkeys-lru：为了给新添加的数据腾出内存空间，Redis会首先删除最近最少使用（LRU，Least Recently Used）的键。
+volatile-lru：为了给新添加的数据腾出内存空间，Redis会首先删除最近最少使用的键，并且这些键必须具有过期时间。
+allkeys-random：为了给新添加的数据腾出内存空间，Redis会随机删除键。
+volatile-random：为了给新添加的数据腾出内存空间，Redis会随机删除键，并且这些键必须具有过期时间。
+volatile-ttl：为了给新添加的数据腾出内存空间，Redis只会删除具有过期时间的键，特别是生存时间（TTL，Time To Live）较短的键。
+
+设置回收策略的经验:
+    当你的访问请求基本服从幂律分布（Power-Law Distribution）时
+（也就是说，缓存的某个元素子集的访问几率要比其余元素的访问几率高得多），你可以使用allkeys-lru策略。
+如果你不确定的话，那么使用allkeys-lru策略也是一个很好的选择。
+
+当你的访问请求会循环访问Redis缓存时（此时，应用程序会不断扫描所有的键），
+或者当你的访问请求基本服从均匀分布（Uniform Distribution）时，你可以使用allkeys-random策略。
+
+如果你在创建各个缓存对象时使用了不同的TTL（生存时间）值，并且你想要让Redis根据这些TTL值来决定回收哪些键的内存，
+那么你可以使用volatile-ttl策略。
+
+当你想要将一个Redis实例既用于缓存数据，又用于持久化保存一些键的数据时，
+大多数情况下可以使用volatile-lru和volatile-random策略。但是，在上述使用场景中，通常最好运行两个Redis实例，
+分别实现缓存和持久化的功能。
+
+LRU采样数量
+    CONFIG SET maxmemory-samples <count>
+
+应用：
+    Redis采样淘汰:
+    如mysql里有2000w条数据，redis只存20w条热点数据，如何保证redis中的数据都是热点数据？
+    这就能设置最大内存，再设置淘汰策略，设置volatile-lru，allkeys-lru等都可以；
+
+
+error
+    The OOM command not allowed when used memory > 'maxmemory'
+error means that Redis was configured with a memory limit and that particular limit was reached.
+In other words: its memory is full, it can't store any new data.
